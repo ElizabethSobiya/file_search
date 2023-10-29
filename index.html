@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Document Processor</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.css"
+    />
+    <link rel="stylesheet" href="./index.css" />
+    <style>
+      .selected-files-info {
+        font-size: 18px;
+        margin: 10px 0;
+      }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth.js/1.6.0/mammoth.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lunr.js/2.3.9/lunr.min.js"></script>
+  </head>
+  <body>
+    <div class="headerMain">
+      <div><img id="imagesIcon" src="./chat_1650229.png" alt="" /></div>
+      <div>
+        <h1>Document Processor: Search Text in Documents.</h1>
+      </div>
+    </div>
+
+    <!-- Display selected files count -->
+
+    <!-- body for verifying -->
+    <div class="wholeContent">
+      <div class="inputContent">
+        <div class="file-upload">
+          <label for="fileInput" class="animated-button">
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            Choose Files
+          </label>
+          <input
+            type="file"
+            id="fileInput"
+            multiple
+            onchange="addFiles(event)"
+          />
+        </div>
+        
+        <!-- Display selected files count -->
+        <p class="selected-files-info" id="selectedFilesInfo">No files selected.</p>        
+      </div>
+      <div class="buttonContent">
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="Search for keywords in your documents"
+          oninput="search()"
+        />
+      </div>
+
+      <div class="buttonContent">
+        <button class="button" onclick="processAndSearch()">
+          Process and Search
+        </button>
+      </div>
+      <!-- Display selected file names -->
+      <div class="buttonContent" id="selectedFilesDisplay"></div>
+      <div id="result"></div>
+      <div id="fileNames"></div>
+    </div>
+
+    <script src="./index.js"></script>
+  </body>
+</html>
