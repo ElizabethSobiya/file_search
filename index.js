@@ -1,6 +1,10 @@
 let files = [];
 let idx; // lunr index
 
+let selectedFiles = [];
+let documents = [];
+let filteredDocuments = []; // Store filtered documents
+
 
 function handleDragOver(event) {
   event.preventDefault();
@@ -36,27 +40,29 @@ function displayFileNames() {
   selectedFilesInfo.textContent = `Selected Files: ${files.length}`;
 }
 
-
 async function processAndSearch() {
   documents = []; // Clear previous documents
   document.getElementById("fileNames").innerHTML = ""; // Clear previous file names
-
-  for (let file of selectedFiles) {
-    // Process each selected file
+ console.log(files, 'files')
+  const textPromises = files.map(async (file) => {
     let text;
+
     if (file.type === "application/pdf") {
+      console.log('pdf')
       text = await extractTextFromPDF(file);
+      console.log(text, 'texxt')
     } else if (
       file.type ===
       "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
     ) {
       text = await extractTextFromDOC(file);
     }
-    documents.push({ id: file.name, text: text });
-  }
 
-  // Display selected file names
-  displayFileNames();
+    documents.push({ id: file.name, text: text });
+  });
+
+  // Wait for all text extraction promises to resolve
+  await Promise.all(textPromises);
 
   // Create an index for all documents
   idx = lunr(function () {
@@ -65,14 +71,8 @@ async function processAndSearch() {
     documents.forEach((doc) => this.add(doc), this);
   });
 
-  // Now that we've processed the documents, let's perform an initial search
   search();
 }
-
-// ... (rest of your code)
-
-
-let filteredDocuments = []; // Store filtered documents
 
 
 async function extractTextFromPDF(file) {
@@ -84,7 +84,7 @@ async function extractTextFromPDF(file) {
     const text = await page.getTextContent();
     textContent += text.items.map((item) => item.str).join(" ");
   }
-
+ console.log(textContent, 'text')
   return textContent;
 }
 
@@ -108,43 +108,43 @@ async function extractTextFromDOC(file) {
     reader.readAsArrayBuffer(file);
   });
 }
-
-let selectedFiles = []; // Store selected files
-let documents = [];
-
 function search() {
   if (!idx) return; // If the index is not ready, return early
-
   const query = document.getElementById("searchInput").value;
-  const results = idx.search(query);
+  console.log("Search query: " + query);
+
+  const keywords = query.split(',').map(keyword => keyword.trim().toLowerCase());
+
+  const matchingFileNames = new Set(); // Use a Set to store unique matching file names
+
+  documents.forEach((doc) => {
+    const text = doc.text.toLowerCase();
+    for (const keyword of keywords) {
+      if (text.includes(keyword)) {
+        matchingFileNames.add(doc.id);
+        break; // If one keyword is found in the document, consider it a match and move to the next document
+      }
+    }
+  });
 
   const resultElement = document.getElementById("result");
   const fileNamesElement = document.getElementById("fileNames");
 
-  resultElement.innerHTML = ""; // Clear previous results
-  fileNamesElement.innerHTML = ""; // Clear previous file names
+  resultElement.innerHTML = ""; 
+  fileNamesElement.innerHTML = "";
 
-  if (results.length === 0) {
+  if (matchingFileNames.size === 0) {
     resultElement.innerHTML = "No matching documents found.";
   } else {
-    results.forEach((result) => {
-      const matchingDocument = documents.find((doc) => doc.id === result.ref);
-      if (matchingDocument) {
-        const documentDiv = document.createElement("div");
-        // const highlightedText = highlightText(matchingDocument.text, query);
-        // documentDiv.innerHTML = `<strong>${result.ref}:</strong><br>${highlightedText}`;
-        // resultElement.appendChild(documentDiv);
-
-        // Display the file name in the fileNamesElement
-        const fileNameDiv = document.createElement("div");
-        fileNameDiv.textContent = `File Name: ${result.ref}`;
-        fileNamesElement.appendChild(fileNameDiv);
-      }
+    fileNamesElement.innerHTML = "Matching File Names:";
+    matchingFileNames.forEach((fileName, index) => {
+      const fileNameDiv = document.createElement("div");
+      fileNameDiv.textContent = `${fileName}`;
+      fileNamesElement.appendChild(fileNameDiv);
     });
   }
 }
 
-// ... (rest of your code, including the extractTextFromPDF and extractTextFromDOC functions)
 
 
 function highlightText(text, query) {
@@ -155,38 +155,4 @@ function highlightText(text, query) {
   );
 }
 
-// Initialize a variable to store filter words
-let filterWords = [];
 
-// Function to apply filters to the displayed documents
-function applyFilters() {
-  // Get the filter input
-  const filterInput = document.getElementById("filterInput").value;
-  const filterArray = filterInput.split(/\s+/).filter(word => word.trim() !== '');
-
-  // Clear previous results
-  const resultElement = document.getElementById("result");
-  resultElement.innerHTML = "";
-
-  if (filterArray.length === 0) {
-    // No filters provided, display all documents
-    documents.forEach(doc => displayDocument(doc));
-  } else {
-    // Apply filters and display matching documents
-    documents.forEach(doc => {
-      if (filterArray.every(filter => doc.text.toLowerCase().includes(filter.toLowerCase()))) {
-        displayDocument(doc);
-      }
-    });
-  }
-}
-
-// Function to display a filtered document
-function displayDocument(doc) {
-  const resultElement = document.getElementById("result");
-  const documentDiv = document.createElement("div");
-  documentDiv.innerHTML = `<strong>${doc.id}:</strong><br>${highlightText(doc.text)}`;
-  resultElement.appendChild(documentDiv);
-}
-
-// ... (rest of your code, including the extractTextFromPDF, extractTextFromDOC, and highlightText functions)

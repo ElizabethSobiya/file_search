@@ -6,17 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link
       rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.css"
+      href=""
     />
     <link rel="stylesheet" href="./index.css" />
-    <style>
-      .selected-files-info {
-        font-size: 18px;
-        margin: 10px 0;
-      }
-    </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth.js/1.6.0/mammoth.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lunr.js/2.3.9/lunr.min.js"></script>
   </head>
   <body>
@@ -26,8 +20,6 @@
         <h1>Document Processor: Search Text in Documents.</h1>
       </div>
     </div>
-
-    <!-- Display selected files count -->
 
     <!-- body for verifying -->
     <div class="wholeContent">
@@ -48,8 +40,7 @@
           />
         </div>
         
-        <!-- Display selected files count -->
-        <p class="selected-files-info" id="selectedFilesInfo">No files selected.</p>        
+        <p class="selected-files-info" id="selectedFilesInfo">No files selected</p>        
       </div>
       <div class="buttonContent">
         <input
@@ -69,6 +60,7 @@
       <div class="buttonContent" id="selectedFilesDisplay"></div>
       <div id="result"></div>
       <div id="fileNames"></div>
+      <div id="fileNamesPlaceholder"></div>
     </div>
 
     <script src="./index.js"></script>
