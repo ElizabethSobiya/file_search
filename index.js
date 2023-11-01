@@ -41,6 +41,8 @@ function displayFileNames() {
 }
 
 async function processAndSearch() {
+  const loader = document.getElementById("loader");
+  loader.style.display = "block";
   documents = []; // Clear previous documents
   document.getElementById("fileNames").innerHTML = ""; // Clear previous file names
  console.log(files, 'files')
@@ -72,6 +74,7 @@ async function processAndSearch() {
   });
 
   search();
+  loader.style.display = "none";
 }
 
 
@@ -109,6 +112,8 @@ async function extractTextFromDOC(file) {
   });
 }
 function search() {
+  const loader = document.getElementById("loader");
+  loader.style.display = "block";
   if (!idx) return; // If the index is not ready, return early
   const query = document.getElementById("searchInput").value;
   console.log("Search query: " + query);
@@ -143,6 +148,7 @@ function search() {
       fileNamesElement.appendChild(fileNameDiv);
     });
   }
+  loader.style.display = "none";
 }
 
 
